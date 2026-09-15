@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grace & Kakuzu están de fiesta</title>
+<meta name="theme-color" content="#f6eee8">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<style>
+:root{
+  --bg:#f6eee8; --paper:#fffaf6; --ink:#2f2a2b;
+  --rose:#d98f9d; --rose-dark:#b86677; --sage:#768e78; --sage-dark:#526a56;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.75),transparent 30%),linear-gradient(180deg,#f8f1ec 0%,#f3e9e2 100%);
+}
+.wrap{max-width:720px;margin:auto;min-height:100vh;padding-bottom:48px}
+.hero{position:relative;overflow:hidden}
+.hero img{width:100%;height:58vh;min-height:420px;max-height:650px;object-fit:cover;display:block;filter:saturate(.95) contrast(1.02)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03) 25%,rgba(0,0,0,.22) 72%,rgba(246,238,232,.98) 100%)}
+.hero-copy{position:absolute;left:24px;right:24px;bottom:30px;z-index:2;color:white;text-shadow:0 2px 20px rgba(0,0,0,.30)}
+.eyebrow{font-size:.82rem;letter-spacing:.20em;text-transform:uppercase;font-weight:800}
+h1{margin:.38rem 0 .55rem;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.7rem,11vw,5rem);line-height:.9}
+.hero-copy p{font-size:1.08rem;margin:0;font-weight:700}
+.card{background:rgba(255,250,246,.94);backdrop-filter:blur(12px);margin:18px 16px 0;border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:24px;box-shadow:0 14px 45px rgba(94,67,56,.10)}
+.intro{text-align:center}.kicker{font-family:Georgia,"Times New Roman",serif;font-size:1.55rem;margin:0 0 8px}.intro p{margin:.35rem 0;color:#5f5553;line-height:1.55}
+.details{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px}.detail{display:flex;gap:14px;align-items:flex-start;background:#fff;border-radius:18px;padding:14px 16px;border:1px solid #f0e5df;text-align:left}.icon{font-size:1.35rem;line-height:1}.detail b{display:block;font-size:.95rem;margin-bottom:2px}.detail span{font-size:.95rem;color:#655b58;line-height:1.35}
+.btns{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px}button,a.btn{appearance:none;border:0;border-radius:18px;padding:16px 18px;font-size:1rem;font-weight:850;text-decoration:none;text-align:center;cursor:pointer;display:block;transition:.2s transform,.2s opacity}button:active,a.btn:active{transform:scale(.985)}.yes{background:var(--sage);color:white}.no{background:var(--rose);color:white}.map{background:#fff;color:#463e3d;border:1px solid #e7d9d0;margin-top:12px}.small{font-size:.83rem;color:#756b68;text-align:center;margin-top:12px;line-height:1.4}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}.countdown div{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;border:1px solid #f0e5df}.countdown strong{font-family:Georgia,serif;font-size:1.55rem;display:block}.countdown span{font-size:.72rem;color:#7b6f6c;text-transform:uppercase;letter-spacing:.08em}
+.gift-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.gift{background:#fff;border:1px solid #f0e5df;border-radius:18px;padding:16px;text-align:center}.gift .emoji{font-size:2rem;margin-bottom:6px}.gift b{display:block;margin-bottom:2px}.gift span{font-size:.8rem;color:#786e6b}
+footer{text-align:center;color:#7c706d;padding:28px 24px 0;font-family:Georgia,serif;font-style:italic}
+.modal{position:fixed;inset:0;background:rgba(30,25,25,.48);display:none;align-items:flex-end;justify-content:center;padding:18px;z-index:20}.modal.open{display:flex}.sheet{width:min(100%,680px);background:#fffaf6;border-radius:26px 26px 20px 20px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.24)}.sheet h2{font-family:Georgia,serif;margin:0 0 8px}.sheet p{margin:0 0 14px;color:#655b58;line-height:1.45}.sheet input{width:100%;border:1px solid #dfd2ca;border-radius:14px;padding:14px;font-size:1rem;margin-bottom:10px;background:white}.sheet .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:4px}.ghost{background:#eee3dc;color:#4d4442}
+@media(min-width:560px){.details{grid-template-columns:1fr 1fr}.btns{grid-template-columns:1fr 1fr}.gift-grid{grid-template-columns:repeat(3,1fr)}}
+.start-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 20% 10%,rgba(255,255,255,.92),transparent 35%),linear-gradient(180deg,#f8f1ec 0%,#efe1d8 100%)}
+.start-card{width:min(100%,560px);text-align:center;background:rgba(255,250,246,.96);border:1px solid rgba(255,255,255,.9);border-radius:32px;padding:34px 24px;box-shadow:0 24px 70px rgba(94,67,56,.16)}
+.start-paws{font-size:2rem;margin-bottom:10px}.start-card .pretitle{text-transform:uppercase;letter-spacing:.14em;font-size:.76rem;font-weight:800;color:#7a6e6b}.start-card h2{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.2rem,10vw,4.2rem);line-height:.95;margin:14px 0 10px;color:#3a3231}.start-card p{color:#746966;margin:0 0 20px}.start-card button{width:100%}.invite-hidden{display:none}.status-box{display:none;margin-top:14px;padding:14px;border-radius:16px;background:#fff;border:1px solid #f0e5df;color:#5e5552;text-align:center}.status-box.show{display:block}.no-cats{display:none;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 16px}.no-cats.show{display:grid}.no-cats img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:20px;background:white;border:1px solid #f0e5df}
+</style>
+</head>
+<body>
+<div class="start-screen" id="startScreen"><div class="start-card"><div class="start-paws">🐾</div><div class="pretitle">Grace & Kakuzu</div><h2>tienen una invitación especial</h2><p>Quieren celebrar contigo 🩷</p><button class="yes" onclick="openInvitation()">Abrir invitación ♡</button></div></div>
+<div class="wrap invite-hidden" id="inviteWrap">
+<section class="hero"><img alt="Grace y Kakuzu" src="data:image/jpeg;base64,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...
