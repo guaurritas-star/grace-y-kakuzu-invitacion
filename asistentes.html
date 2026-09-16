@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6eee8">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Panel de asistentes · Grace & Kakuzu</title>
+<style>
+:root{--paper:#fffaf6;--ink:#30292a;--rose:#d98f9d;--sage:#758d78;--line:#eadbd2;--bg:#f2e6de}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(#fbf6f2,#efe1d8);min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:28px 16px 56px}.card{background:rgba(255,250,246,.98);border:1px solid #fff;border-radius:28px;padding:22px;box-shadow:0 18px 55px #6b4d3c14;margin-bottom:16px}
+.center{text-align:center}.eyebrow{font-size:.76rem;letter-spacing:.18em;font-weight:850;color:#7e706b;text-transform:uppercase}.title{font:700 clamp(2.2rem,8vw,4rem)/1 Georgia,serif;margin:10px 0 6px}.muted{color:#6f625f;line-height:1.5}
+.lock{min-height:78vh;display:grid;place-items:center}.lock .card{width:min(100%,480px)}
+input{width:100%;padding:15px 16px;border:1px solid #decfc6;border-radius:15px;font-size:1.05rem;background:#fff;margin-top:10px;outline:none}input:focus{border-color:#9b8d85;box-shadow:0 0 0 3px #9b8d8518}
+button{width:100%;border:0;border-radius:16px;padding:15px 18px;font-weight:800;font-size:1rem;cursor:pointer;margin-top:10px}.primary{background:var(--sage);color:#fff}.secondary{background:#eee3dc;color:#4d4442}
+.error{display:none;color:#a23a45;background:#fff0f1;border:1px solid #f0cbd0;padding:11px 13px;border-radius:13px;margin-top:10px}
+#dashboard{display:none}
+.hero{padding:8px 4px 18px}.hero h1{font:700 clamp(2.4rem,9vw,4.4rem)/.95 Georgia,serif;margin:10px 0}.hero p{margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 10px;text-align:center}.stat strong{display:block;font:700 1.9rem Georgia,serif}.stat span{font-size:.77rem;color:#756966;text-transform:uppercase;letter-spacing:.04em}
+.section-title{font:700 1.45rem Georgia,serif;margin:0 0 12px}.guest{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:9px}.guest-name{font-weight:800}.guest small{display:block;color:#7a6e6a;margin-top:3px}.pill{white-space:nowrap;padding:7px 10px;border-radius:999px;background:#eef3ed;color:#4f6953;font-weight:800;font-size:.82rem}.declined .pill{background:#faecee;color:#a25e69}
+.empty{color:#7a6e6a;text-align:center;padding:22px 8px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar button{width:auto;margin:0;padding:10px 13px;font-size:.88rem}
+.updated{font-size:.8rem;color:#8b7d78;text-align:center;margin-top:12px}
+@media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:1/-1}.wrap{padding:18px 12px 40px}.card{padding:18px}}
+</style>
+</head>
+<body>
+<section class="lock" id="lock">
+  <div class="card center">
+    <div class="eyebrow">Panel privado</div>
+    <h1 class="title">Lista de asistentes</h1>
+    <p class="muted">Grace & Kakuzu 🐾<br>Ingresa tu código para consultar los RSVP.</p>
+    <input id="code" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="Código de acceso">
+    <button class="primary" id="enter">Entrar</button>
+    <div class="error" id="error">Código incorrecto. Intenta de nuevo.</div>
+  </div>
+</section>
+
+<main class="wrap" id="dashboard">
+  <div class="hero">
+    <div class="topbar">
+      <div><div class="eyebrow">Grace & Kakuzu</div></div>
+      <button class="secondary" id="logout">Cerrar</button>
+    </div>
+    <h1>Asistentes 🐾</h1>
+    <p class="muted">Resumen actualizado de las respuestas de la invitación.</p>
+  </div>
+
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><strong id="confirmedCount">0</strong><span>Confirmados</span></div>
+      <div class="stat"><strong id="peopleCount">0</strong><span>Personas</span></div>
+      <div class="stat"><strong id="declinedCount">0</strong><span>No podrán ir</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">✓ Sí asistirán</h2>
+    <div id="confirmedList"></div>
+  </section>
+
+  <section class="card declined">
+    <h2 class="section-title">× No podrán asistir</h2>
+    <div id="declinedList"></div>
+  </section>
+
+  <div class="updated" id="updated"></div>
+</main>
+
+<script>
+const encUrl='assets/asistentes.enc';
+
+function b64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+async function deriveKey(code,salt,iters){
+  const raw=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iters,hash:'SHA-256'},raw,{name:'AES-GCM',length:256},false,['decrypt']);
+}
+async function decryptPayload(code){
+  const p=await fetch(encUrl+'?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('data');return r.json()});
+  const key=await deriveKey(code,b64(p.salt),p.iterations);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(p.iv)},key,b64(p.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+function render(data){
+  const yes=data.confirmed||[], no=data.declined||[];
+  confirmedCount.textContent=yes.length;
+  peopleCount.textContent=yes.reduce((a,x)=>a+(Number(x.people)||0),0);
+  declinedCount.textContent=no.length;
+  confirmedList.innerHTML=yes.length?yes.map(x=>`<div class="guest"><div><div class="guest-name">${esc(x.name)}</div><small>${esc(x.date||'')}</small></div><div class="pill">${Number(x.people)||0} ${Number(x.people)===1?'persona':'personas'}</div></div>`).join(''):'<div class="empty">Todavía no hay confirmaciones.</div>';
+  declinedList.innerHTML=no.length?no.map(x=>`<div class="guest"><div><div class="guest-name">${esc(x.name)}</div><small>${esc(x.date||'')}</small></div><div class="pill">No asistirá</div></div>`).join(''):'<div class="empty">Nadie ha respondido que no por ahora.</div>';
+  updated.textContent='Última sincronización: '+new Date(data.updatedAt).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'});
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+async function unlock(){
+  error.style.display='none'; enter.disabled=true; enter.textContent='Abriendo…';
+  try{
+    const c=code.value.trim();
+    const data=await decryptPayload(c);
+    sessionStorage.setItem('gk_panel_code',c);
+    lock.style.display='none';dashboard.style.display='block';render(data);
+  }catch(e){error.style.display='block'}
+  finally{enter.disabled=false;enter.textContent='Entrar'}
+}
+enter.onclick=unlock; code.addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
+logout.onclick=()=>{sessionStorage.removeItem('gk_panel_code');location.reload()};
+(async()=>{const c=sessionStorage.getItem('gk_panel_code');if(c){code.value=c;await unlock()}})();
+</script>
+</body>
+</html>
